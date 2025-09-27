@@ -3,8 +3,8 @@ import Quagga from "@ericblade/quagga2";
 
 export default function QuaggaScanner({onDetected}) {
     const scanner = useRef(null);
-    const [result, setResult] = useState("");
-    const [input, setInput] = useState("");
+    const [result, setResult] = useState(""); 
+    const [input, setInput] = useState(""); 
 
     useEffect(() => {
         // Inisialisasi camera
@@ -30,16 +30,19 @@ export default function QuaggaScanner({onDetected}) {
             Quagga.start();
         })
         
-        // callback menerima hasil scanner
-        Quagga.onDetected((result) => {
+        // Patern (pola berulang)
+        const handler = (result) => {
             if(result?.codeResult?.code) {
-                onDetected?.(result.codeResult.code);
-            }
-        })
+                setResult(result.codeResult.code);
+                onDetected(result.codeResult.code);
+            };
+        }
+
+        Quagga.onDetected(handler)
 
         return() => {
+            Quagga.offDetected(handler);
             Quagga.stop();
-            Quagga.offDetected();
         }
     }, [onDetected]) // depedency 
 
