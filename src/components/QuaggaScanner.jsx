@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Quagga from "@ericblade/quagga2";
 
 export default function QuaggaScanner({onDetected}) {
-const scanner = useRef(null);
+    const scanner = useRef(null);
+    const [result, setResult] = useState("");
+    const [input, setInput] = useState("");
 
     useEffect(() => {
-        if(!scanner.current) return;
-
         // Inisialisasi camera
         Quagga.init({
             inputStream: {
@@ -42,8 +42,24 @@ const scanner = useRef(null);
             Quagga.offDetected();
         }
     }, [onDetected]) // depedency 
+
+    const noDetected = (event) =>{
+        if(event.key === "Enter" && input.trim() !== "") {
+            setResult(input);
+            setInput("") // reset input
+        }
+    }
     
     return(
-        <div className="Camera" ref={scanner}></div>
+        <div className="wrape">
+            <div className="camera" ref={scanner}>
+            </div>
+            <input className="input" type="text" value={input} onKeyDown={noDetected} placeholder="Manual barcode..." onChange={(x) => setInput(x.target.value)}></input>
+            {result && (
+                <p className="result_barcode">
+                    Hasil barcode: {result}
+                </p>
+            )}
+        </div>
     )
 }
